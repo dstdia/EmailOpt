@@ -1,0 +1,2 @@
+<apex:page controller="EmailOptInController" applyHtmlTag="false" docType="html-5.0" showHeader="false" standardStylesheets="false" action="{!updateObjects}">
+</apex:page>
