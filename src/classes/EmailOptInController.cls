@@ -29,7 +29,7 @@ public without sharing class EmailOptInController {
                                             WHERE   MasterLabel = 'Default' 
                                             LIMIT   1];
 
-        List<Account> accList = new List<Account>();
+        List<Contact> contactList = new List<Account>();
         List<Lead> leadList = new List<Lead>();
         Boolean hashIsValid; 
         String theEmail; 
@@ -41,13 +41,13 @@ public without sharing class EmailOptInController {
 
         md5Hash = String.escapeSingleQuotes(md5Hash);
 
-        //firstly search for a account matching the hash
-        accList = [SELECT Id, PersonEmail FROM Account WHERE MD5Hash__c = :md5Hash];
+        //firstly search for a contact matching the hash
+        contactList = [SELECT Id, Email FROM Email WHERE MD5Hash__c = :md5Hash];
 
         if(!accList.isEmpty()) {
 
             hashIsValid = true;
-            theEmail = accList[0].PersonEmail;
+            theEmail = contactList[0].Email;
         } else {
 
             //firstly if an account was not found search for a lead matching the hash code
@@ -66,7 +66,7 @@ public without sharing class EmailOptInController {
         } else {
 
             List<Lead> leadsToModifyList = [SELECT Id FROM Lead WHERE Email = :theEmail];
-            List<Account> accountsToModifyList = [SELECT Id FROM Account WHERE PersonEmail = :theEmail];
+            List<Contact> contactsToModifyList = [SELECT Id FROM Contact WHERE Email = :theEmail];
 
             for(Lead l : leadsToModifyList) {
 
@@ -74,14 +74,14 @@ public without sharing class EmailOptInController {
                 l.HasOptedOutOfEmail = true;
             }
 
-            for(Account a : accountsToModifyList) {
+            for(Contact c : contactsToModifyList) {
 
-                a.OptinEmail__pc = false; 
-                a.PersonHasOptedOutOfEmail = true; 
+                c.OptinEmail__c = false;
+                c.PersonHasOptedOutOfEmail = true;
             }
 
             update leadsToModifyList; 
-            update accountsToModifyList; 
+            update contactsToModifyList;
 	       
             return new PageReference(urlSettings.Email_Opt_Out_Success_URL__c);
         }
